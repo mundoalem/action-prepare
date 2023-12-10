@@ -18,4 +18,4 @@ jobs:
 
       - name: lint action.yml
         run: |
-          yamllint -c .yamllint.conf action.yml
+          yamllint -c ./.yamllint.yml action.yml
