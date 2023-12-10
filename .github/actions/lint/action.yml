@@ -55,11 +55,13 @@ runs:
   using: "composite"
   steps:
     - name: install yamllint
+      shell: bash
       run: |
         pip install --user yamllint
         which yamllint
 
     - name: lint action.yml
+      shell: bash
       run: |
         ls -la
         yamllint -c ./.yamllint.yml action.yml

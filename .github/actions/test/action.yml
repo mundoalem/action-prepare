@@ -61,5 +61,6 @@ runs:
         step: lint
 
     - name: check if dependencies are installed
+      shell: bash
       run: |
         which hadolint
