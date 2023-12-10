@@ -1,0 +1,22 @@
+name: test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  test-container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out code
+        uses: actions/checkout@v3
+
+      - name: test preparing container project for lint step
+        uses: ./
+        with:
+          type: container
+          step: lint

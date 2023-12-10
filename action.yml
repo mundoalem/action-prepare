@@ -1,0 +1,107 @@
+# ######################################################################################################################
+# LICENSE
+# ######################################################################################################################
+
+#
+# This file is part of action-prepare.
+#
+# The action-prepare is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+# General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# The action-prepare is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along with action-prepare. If not, see 
+# <https://www.gnu.org/licenses/>.
+#
+
+# ######################################################################################################################
+# ACTION
+# ######################################################################################################################
+
+#
+# Empty
+#
+
+# ----------------------------------------------------------------------------------------------------------------------
+# METADATA
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# General
+#
+
+name: "Prepare"
+description: "Prepare the runner to run jobs for a specific project type and pipeline step"
+
+#
+# Branding
+#
+
+# See: https://haya14busa.github.io/github-action-brandings/
+
+branding:
+  icon: "circle"
+  color: "gray-dark"
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INPUTS
+# ----------------------------------------------------------------------------------------------------------------------
+
+inputs:
+  
+  step:
+    description: "Kind of execution we are preparing for"
+    required: true
+
+  type:
+    description: "Operational System To Be Prepared"
+    required: true
+
+  version_hadolint:
+    description: "Version of hadolint to be installed"
+    required: false
+    default: "2.12.0"
+
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# OUTPUTS
+# ----------------------------------------------------------------------------------------------------------------------
+
+outputs:
+
+# ----------------------------------------------------------------------------------------------------------------------
+# RUN
+# ----------------------------------------------------------------------------------------------------------------------
+
+runs:
+  using: "composite"
+  steps:
+    - name: check runner os
+      if: ${{ runner.os != "Linux" }}
+      shell: bash
+      run: |
+        echo "::error title=unsupported os"
+        exit 1
+
+    - name: install hadolint
+      if: ${{ inputs.type == "container" && inputs.step == "lint" }}
+      shell: bash
+      run: |
+        if [ ${{ runner.arch }} = "ARM64" ]; then
+          ARCH="arm64"
+        elif [ ${{ runner.arch }} = "X64" ]; then
+          ARCH="x86_64"
+        else
+          echo "::error title=unsupported cpu architecture"
+          exit 1
+        fi
+
+        curl -fsSL \
+          -o /usr/local/bin/hadolint \
+          "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version_hadolint }}/hadolint-Linux-${ARCH}"
+        
+        chmod +x /usr/local/bin/hadolint
