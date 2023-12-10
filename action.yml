@@ -13,7 +13,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License along with action-prepare. If not, see 
+# You should have received a copy of the GNU Affero General Public License along with action-prepare. If not, see
 # <https://www.gnu.org/licenses/>.
 #
 
@@ -51,7 +51,7 @@ branding:
 # ----------------------------------------------------------------------------------------------------------------------
 
 inputs:
-  
+
   step:
     description: "Kind of execution we are preparing for"
     required: true
@@ -64,8 +64,6 @@ inputs:
     description: "Version of hadolint to be installed"
     required: false
     default: "2.12.0"
-
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OUTPUTS
@@ -81,7 +79,7 @@ runs:
   using: "composite"
   steps:
     - name: check runner os
-      if: ${{ runner.os != "Linux" }}
+      if: ${{ runner.os != 'Linux' }}
       shell: bash
       run: |
         echo "::error title=unsupported os"
@@ -103,5 +101,5 @@ runs:
         curl -fsSL \
           -o /usr/local/bin/hadolint \
           "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version_hadolint }}/hadolint-Linux-${ARCH}"
-        
+
         chmod +x /usr/local/bin/hadolint
