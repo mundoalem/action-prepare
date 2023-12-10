@@ -63,5 +63,4 @@ runs:
     - name: lint action.yml
       shell: bash
       run: |
-        ls -la
-        yamllint -c ./.yamllint.yml action.yml
+        yamllint action.yml

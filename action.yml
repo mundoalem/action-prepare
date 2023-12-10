@@ -26,6 +26,7 @@
 #
 
 # yamllint disable rule:document-start
+# yamllint disable rule:line-length
 
 # ----------------------------------------------------------------------------------------------------------------------
 # METADATA
