@@ -25,8 +25,7 @@
 # YAMLLINT
 #
 
-# yamllint disable rule:document-start
-# yamllint disable rule:line-length
+# yamllint disable rule:document-start rule:line-length
 
 # ----------------------------------------------------------------------------------------------------------------------
 # METADATA
