@@ -21,12 +21,6 @@
 # ACTION
 # ######################################################################################################################
 
-#
-# YAMLLINT
-#
-
-# yamllint disable rule:document-start
-
 # ----------------------------------------------------------------------------------------------------------------------
 # METADATA
 # ----------------------------------------------------------------------------------------------------------------------
@@ -35,35 +29,15 @@
 # GENERAL
 #
 
-name: "Prepare"
-description: "Prepare the runner to run jobs for a specific project type and pipeline step"
-
-#
-# BRANDING
-#
-
-branding:
-  icon: "circle"
-  color: "gray-dark"
+name: "lint"
 
 # ######################################################################################################################
 # INPUTS
 # ######################################################################################################################
 
-inputs:
-
-  step:
-    description: "Kind of execution we are preparing for"
-    required: true
-
-  type:
-    description: "Operational System To Be Prepared"
-    required: true
-
-  version_hadolint:
-    description: "Version of hadolint to be installed"
-    required: false
-    default: "2.12.0"
+#
+# Empty
+#
 
 # ######################################################################################################################
 # OUTPUTS
@@ -80,28 +54,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: check runner os
-      if: ${{ runner.os != 'Linux' }}
-      shell: bash
+    - name: install yamllint
       run: |
-        echo "::error title=unsupported os"
-        exit 1
+        pip install --user yamllint
+        which yamllint
 
-    - name: install hadolint
-      if: ${{ inputs.type == 'container' && inputs.step == 'lint' }}
-      shell: bash
+    - name: lint action.yml
       run: |
-        if [ ${{ runner.arch }} = "ARM64" ]; then
-          ARCH="arm64"
-        elif [ ${{ runner.arch }} = "X64" ]; then
-          ARCH="x86_64"
-        else
-          echo "::error title=unsupported cpu architecture"
-          exit 1
-        fi
-
-        curl -fsSL \
-          -o /usr/local/bin/hadolint \
-          "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version_hadolint }}/hadolint-Linux-${ARCH}"
-
-        chmod +x /usr/local/bin/hadolint
+        ls -la
+        yamllint -c ./.yamllint.yml action.yml
