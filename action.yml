@@ -56,15 +56,15 @@ inputs:
     description: "Operational System To Be Prepared"
     required: true
 
-  version_hadolint:
+  version_checkov:
     description: "Version of checkov to be installed"
     required: false
-    default: "2.12.0"
+    default: "3.1.38"
 
   version_hadolint:
     description: "Version of hadolint to be installed"
     required: false
-    default: "3.1.38"
+    default: "2.12.0"
 
 # ######################################################################################################################
 # OUTPUTS
