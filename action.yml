@@ -57,9 +57,14 @@ inputs:
     required: true
 
   version_hadolint:
-    description: "Version of hadolint to be installed"
+    description: "Version of checkov to be installed"
     required: false
     default: "2.12.0"
+
+  version_hadolint:
+    description: "Version of hadolint to be installed"
+    required: false
+    default: "3.1.38"
 
 # ######################################################################################################################
 # OUTPUTS
@@ -101,3 +106,10 @@ runs:
           "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version_hadolint }}/hadolint-Linux-${ARCH}"
 
         chmod +x /usr/local/bin/hadolint
+
+    - name: install checkov
+      if: ${{ inputs.type == 'container' && inputs.step == 'scan' }}
+      shell: bash
+      run: |
+        pip install --user checkov==${{ inputs.version_checkov }}
+        which checkov

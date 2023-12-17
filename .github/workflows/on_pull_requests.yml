@@ -1,9 +1,7 @@
-name: On Pull Requests To Main Branch
+name: On Pull Requests
 
 on:
   pull_request:
-    branches:
-      - main
 
 jobs:
   lint:
