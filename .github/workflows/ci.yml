@@ -27,13 +27,13 @@ jobs:
         uses: ./
         with:
           type: container
-          step: ci
+          job: ci
       
       - name: Test CD of Container Projects
         uses: ./
         with:
           type: container
-          step: cd
+          job: cd
 
       - name: Verification
         run: |

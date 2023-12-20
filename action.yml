@@ -32,7 +32,7 @@
 #
 
 name: "Prepare"
-description: "Prepare the runner to run jobs for a specific project type and pipeline step"
+description: "Prepare the runner environment for jobs of a specific project type"
 
 #
 # BRANDING
