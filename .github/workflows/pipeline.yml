@@ -29,7 +29,7 @@
 # GENERAL
 #
 
-name: Continuous Integration
+name: Pipeline
 
 #
 # TRIGGER
@@ -40,6 +40,7 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 # ######################################################################################################################
 # ENVIRONMENT VARIABLES
