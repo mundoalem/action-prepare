@@ -117,7 +117,7 @@ runs:
     - name: setup qemu
       if: ${{ inputs.type == 'container' && inputs.job == 'cd' }}
       uses: docker/setup-qemu-action@v3
-    
+
     - name: setup docker buildx
       if: ${{ inputs.type == 'container' && inputs.job == 'cd' }}
       uses: docker/setup-buildx-action@v1
