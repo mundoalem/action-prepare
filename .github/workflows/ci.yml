@@ -1,0 +1,44 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Yamllint
+        run: |
+          pip install --user yamllint
+          which yamllint
+
+      - name: Lint "action.yml"
+        run: |
+          yamllint action.yml
+
+      - name: Test CI of Container Projects
+        uses: ./
+        with:
+          type: container
+          step: ci
+      
+      - name: Test CD of Container Projects
+        uses: ./
+        with:
+          type: container
+          step: cd
+
+      - name: Verification
+        run: |
+          set -e
+          which hadolint
+          which checkov
+          which docker
+          docker buildx version

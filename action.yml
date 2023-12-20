@@ -48,8 +48,8 @@ branding:
 
 inputs:
 
-  step:
-    description: "Kind of execution we are preparing for"
+  job:
+    description: "Job we are preparing for"
     required: true
 
   type:
@@ -89,7 +89,7 @@ runs:
         exit 1
 
     - name: install hadolint
-      if: ${{ inputs.type == 'container' && inputs.step == 'lint' }}
+      if: ${{ inputs.type == 'container' && inputs.job == 'ci' }}
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
@@ -108,8 +108,16 @@ runs:
         chmod +x /usr/local/bin/hadolint
 
     - name: install checkov
-      if: ${{ inputs.type == 'container' && inputs.step == 'scan' }}
+      if: ${{ inputs.type == 'container' && inputs.job == 'ci' }}
       shell: bash
       run: |
         pip install --user checkov==${{ inputs.version_checkov }}
         which checkov
+
+    - name: setup qemu
+      if: ${{ inputs.type == 'container' && inputs.job == 'cd' }}
+      uses: docker/setup-qemu-action@v3
+    
+    - name: setup docker buildx
+      if: ${{ inputs.type == 'container' && inputs.job == 'cd' }}
+      uses: docker/setup-buildx-action@v1
