@@ -115,7 +115,7 @@ runs:
         which checkov
 
     - name: setup qemu
-      if: ${{ inputs.type == 'container' && inputs.job == 'cd' }}
+      if: ${{ inputs.type == 'container' && ( inputs.job == 'ci' || inputs.job == 'cd')}}
       uses: docker/setup-qemu-action@v3
 
     - name: setup docker buildx
