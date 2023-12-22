@@ -89,7 +89,7 @@ runs:
         exit 1
 
     - name: install hadolint
-      if: ${{ inputs.type == 'container' && inputs.job == 'ci' }}
+      if: ${{ inputs.type == 'container' && inputs.job == 'lint' }}
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
@@ -108,7 +108,7 @@ runs:
         chmod +x /usr/local/bin/hadolint
 
     - name: install checkov
-      if: ${{ inputs.type == 'container' && inputs.job == 'ci' }}
+      if: ${{ inputs.type == 'container' && inputs.job == 'scan' }}
       shell: bash
       run: |
         pip install --user checkov==${{ inputs.version_checkov }}
