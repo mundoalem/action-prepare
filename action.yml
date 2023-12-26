@@ -1,0 +1,122 @@
+# yamllint disable rule:document-start rule:line-length
+
+# ######################################################################################################################
+# LICENSE
+# ######################################################################################################################
+
+#
+# This file is part of action-prepare.
+#
+# The action-prepare is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+# General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# The action-prepare is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along with action-prepare. If not, see
+# <https://www.gnu.org/licenses/>.
+#
+
+# ######################################################################################################################
+# ACTION
+# ######################################################################################################################
+
+# ----------------------------------------------------------------------------------------------------------------------
+# METADATA
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# GENERAL
+#
+
+name: "Prepare"
+description: "Prepare the runner environment for jobs of a specific project type"
+
+#
+# BRANDING
+#
+
+branding:
+  icon: "circle"
+  color: "gray-dark"
+
+# ######################################################################################################################
+# INPUTS
+# ######################################################################################################################
+
+inputs:
+  job:
+    description: "Job we are preparing for"
+    required: true
+
+  type:
+    description: "Project type we are preparing for"
+    required: true
+
+  version_checkov:
+    description: "Version of checkov to be installed"
+    required: false
+    default: "3.1.38"
+
+  version_hadolint:
+    description: "Version of hadolint to be installed"
+    required: false
+    default: "2.12.0"
+
+# ######################################################################################################################
+# OUTPUTS
+# ######################################################################################################################
+
+#
+# Empty
+#
+
+# ######################################################################################################################
+# RUN
+# ######################################################################################################################
+
+runs:
+  using: "composite"
+  steps:
+    - name: check runner os
+      if: ${{ runner.os != 'Linux' }}
+      shell: bash
+      run: |
+        echo "::error title=unsupported os"
+        exit 1
+
+    - name: install hadolint
+      if: ${{ inputs.type == 'container' && inputs.job == 'lint' }}
+      shell: bash
+      run: |
+        if [ ${{ runner.arch }} = "ARM64" ]; then
+          ARCH="arm64"
+        elif [ ${{ runner.arch }} = "X64" ]; then
+          ARCH="x86_64"
+        else
+          echo "::error title=unsupported cpu architecture"
+          exit 1
+        fi
+
+        curl -fsSL \
+          -o /usr/local/bin/hadolint \
+          "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version_hadolint }}/hadolint-Linux-${ARCH}"
+
+        chmod +x /usr/local/bin/hadolint
+
+    - name: install checkov
+      if: ${{ inputs.type == 'container' && inputs.job == 'scan' }}
+      shell: bash
+      run: |
+        pip install --user checkov==${{ inputs.version_checkov }}
+        which checkov
+
+    - name: setup qemu
+      if: ${{ inputs.type == 'container' && ( inputs.job == 'ci' || inputs.job == 'cd')}}
+      uses: docker/setup-qemu-action@v3
+
+    - name: setup docker buildx
+      if: ${{ inputs.type == 'container' && inputs.job == 'cd' }}
+      uses: docker/setup-buildx-action@v1
