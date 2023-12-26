@@ -81,7 +81,7 @@ jobs:
         uses: ./
         with:
           type: container
-          job: lint
+          job: scan
 
       - name: Test CI of Container Projects
         uses: ./
