@@ -71,6 +71,18 @@ jobs:
         run: |
           yamllint action.yml
 
+      - name: Test Lint of Container Projects
+        uses: ./
+        with:
+          type: container
+          job: lint
+
+      - name: Test Scan of Container Projects
+        uses: ./
+        with:
+          type: container
+          job: lint
+
       - name: Test CI of Container Projects
         uses: ./
         with:
