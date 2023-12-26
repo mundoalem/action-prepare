@@ -47,13 +47,12 @@ branding:
 # ######################################################################################################################
 
 inputs:
-
   job:
     description: "Job we are preparing for"
     required: true
 
   type:
-    description: "Operational System To Be Prepared"
+    description: "Project type we are preparing for"
     required: true
 
   version_checkov:
