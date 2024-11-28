@@ -36,6 +36,11 @@ inputs:
     description: "Project type we are preparing for"
     required: true
 
+  version_alejandra:
+    description: "Version of alejandra to be installed"
+    required: false
+    default: "3.1.0"
+
   version_checkov:
     description: "Version of checkov to be installed"
     required: false
