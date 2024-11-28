@@ -54,11 +54,17 @@ jobs:
           type: nix
           job: ci
 
+      - name: Test General Project
+        uses: ./
+        with:
+          type: general
+
       - name: Verification
         run: |
           set -e
-          which hadolint
+          which alejandra
           which checkov
           which docker
+          which hadolint
+          which task
           docker buildx version
-          which alejandra

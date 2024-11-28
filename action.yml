@@ -51,6 +51,11 @@ inputs:
     required: false
     default: "2.12.0"
 
+  version_task:
+    description: "Version of task to be installed"
+    required: false
+    default: "3.40.0"
+
 # ##############################################################################
 # OUTPUTS
 # ##############################################################################
@@ -107,8 +112,28 @@ runs:
       if: ${{ inputs.type == 'container' && inputs.job == 'cd' }}
       uses: docker/setup-buildx-action@v1
 
+    - name: setup task
+      if: ${{ inputs.type == 'general' }}
+      shell: bash
+      run: |
+        if [ ${{ runner.arch }} = "ARM64" ]; then
+          ARCH="arm64"
+        elif [ ${{ runner.arch }} = "X64" ]; then
+          ARCH="amd64"
+        else
+          echo "::error title=unsupported cpu architecture"
+          exit 1
+        fi
+
+        curl -fsSL \
+          "https://github.com/go-task/task/releases/download/v${{ inputs.version_task }}/task_linux_${ARCH}.tar.gz" \
+          | tar xzO task
+
+        mv task /usr/local/bin
+        chmod +x /usr/local/bin/task
+
     - name: setup alejandra
-      if: ${{ inputs.type == 'nix' && inputs.job == 'ci' }}
+      if: ${{ inputs.type == 'nix' && ( inputs.job == 'ci' || inputs.job == 'lint' ) }}
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
