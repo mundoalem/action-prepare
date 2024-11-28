@@ -9,15 +9,17 @@ currently supported project types and jobs are:
 | Project Type | Jobs               | OS    |
 | ------------ | ------------------ | ----- |
 | container    | cd, ci, lint, scan | linux |
+| nix          | ci                 | linux |
 
 # Inputs
 
-| Input            | Description                         | Required | Default |
-| ---------------- | ----------------------------------- | -------- | ------- |
-| job              | Job we are preparing for            | Yes      |         |
-| type             | Project type we are preparing for   | Yes      |         |
-| version_checkov  | Version of checkov to be installed  | No       | 3.1.38  |
-| version_hadolint | Version of hadolint to be installed | No       | 2.12.0  |
+| Input             | Description                          | Required | Default |
+| ----------------- | ------------------------------------ | -------- | ------- |
+| job               | Job we are preparing for             | Yes      |         |
+| type              | Project type we are preparing for    | Yes      |         |
+| version_alejandra | Version of alejandra to be installed | No       | 3.1.0   |
+| version_checkov   | Version of checkov to be installed   | No       | 3.1.38  |
+| version_hadolint  | Version of hadolint to be installed  | No       | 2.12.0  |
 
 # Outputs
 
@@ -48,4 +50,4 @@ Setting up the `lint` job of a `container` project type with a specific version 
 
 # License
 
-[GNU Affero General Public License Version 3](https://github.com/mundoalem/action-prepare/blob/main/LICENSE)
+[GNU General Public License Version 3](https://github.com/mundoalem/action-prepare/blob/main/LICENSE)
