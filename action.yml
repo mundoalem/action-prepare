@@ -127,7 +127,7 @@ runs:
 
         curl -fsSL \
           "https://github.com/go-task/task/releases/download/v${{ inputs.version_task }}/task_linux_${ARCH}.tar.gz" \
-          | tar xzO task
+          | tar zxf - task
 
         mv task /usr/local/bin
         chmod +x /usr/local/bin/task
