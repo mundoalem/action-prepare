@@ -54,11 +54,6 @@ jobs:
           type: nix
           job: ci
 
-      - name: Test General Project
-        uses: ./
-        with:
-          type: general
-
       - name: Verification
         run: |
           set -e

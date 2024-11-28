@@ -9,7 +9,6 @@ currently supported project types and jobs are:
 | Project Type | Jobs               | OS    |
 | ------------ | ------------------ | ----- |
 | container    | cd, ci, lint, scan | linux |
-| general      | -                  | linux |
 | nix          | ci                 | linux |
 
 # Inputs

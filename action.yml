@@ -113,7 +113,7 @@ runs:
       uses: docker/setup-buildx-action@v1
 
     - name: setup task
-      if: ${{ inputs.type == 'general' }}
+      if: ${{ inputs.type == 'nix' }}
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
