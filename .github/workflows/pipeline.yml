@@ -58,8 +58,12 @@ jobs:
         run: |
           set -e
           which alejandra
+          alejandra --version
           which checkov
+          checkov --version
           which docker
-          which hadolint
-          which task
           docker buildx version
+          which hadolint
+          hadolint --version
+          which task
+          task --version
