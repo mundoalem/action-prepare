@@ -18,7 +18,7 @@ currently supported project types and jobs are:
 | job               | Job we are preparing for             | Yes      |         |
 | type              | Project type we are preparing for    | Yes      |         |
 | version_alejandra | Version of alejandra to be installed | No       | 3.1.0   |
-| version_checkov   | Version of checkov to be installed   | No       | 3.1.38  |
+| version_checkov   | Version of checkov to be installed   | No       | 3.2.322 |
 | version_hadolint  | Version of hadolint to be installed  | No       | 2.12.0  |
 | version_task      | Version of task to be installed      | No       | 3.40.0  |
 
