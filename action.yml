@@ -147,6 +147,6 @@ runs:
 
         curl -fsSL \
           -o /usr/local/bin/alejandra \
-          "https://github.com/kamadorueda/alejandra/releases/download/${{ inputs.version_alejandra }}/alejandra-${ARCH}-unknown-linux-gnu"
+          "https://github.com/kamadorueda/alejandra/releases/download/${{ inputs.version_alejandra }}/alejandra-${ARCH}-unknown-linux-musl"
 
         chmod +x /usr/local/bin/alejandra
