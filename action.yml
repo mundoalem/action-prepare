@@ -44,7 +44,7 @@ inputs:
   version_checkov:
     description: "Version of checkov to be installed"
     required: false
-    default: "3.1.38"
+    default: "3.2.322"
 
   version_hadolint:
     description: "Version of hadolint to be installed"
