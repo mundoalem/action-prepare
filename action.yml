@@ -150,3 +150,9 @@ runs:
           "https://github.com/kamadorueda/alejandra/releases/download/${{ inputs.version_alejandra }}/alejandra-${ARCH}-unknown-linux-musl"
 
         chmod +x /usr/local/bin/alejandra
+
+    - name: setup cdktf
+      if: ${{ inputs.type == 'cdktf' }}
+      shell: bash
+      run: |
+        npm install --global cdktf-cli@latest

@@ -54,6 +54,12 @@ jobs:
           type: nix
           job: ci
 
+      - name: Test CI of CDKTF Projects
+        uses: ./
+        with:
+          type: cdktf
+          job: ci
+
       - name: Verification
         run: |
           set -e
@@ -67,3 +73,5 @@ jobs:
           hadolint --version
           which task
           task --version
+          which cdktf
+          cdktf --version
