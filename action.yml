@@ -61,6 +61,11 @@ inputs:
     required: false
     default: "3.40.0"
 
+  version_tenv:
+    description: "Version of tenv to be installed"
+    required: false
+    default: "4.1.0"
+
 # ##############################################################################
 # OUTPUTS
 # ##############################################################################
@@ -136,6 +141,26 @@ runs:
 
         mv task /usr/local/bin
         chmod +x /usr/local/bin/task
+
+    - name: setup tenv
+      if: ${{ inputs.type == 'cdktf' }}
+      shell: bash
+      run: |
+        if [ ${{ runner.arch }} = "ARM64" ]; then
+          ARCH="arm64"
+        elif [ ${{ runner.arch }} = "X64" ]; then
+          ARCH="amd64"
+        else
+          echo "::error title=unsupported cpu architecture"
+          exit 1
+        fi
+
+        curl -fsSL \
+          -o /tmp/tenv.deb \
+          "https://github.com/tofuutils/tenv/releases/latest/download/tenv_v${{ inputs.version_tenv }}_${ARCH}.deb"
+
+        sudo dpkg -i /tmp/tenv.deb
+        rm -f /tmp/tenv.deb
 
     - name: setup alejandra
       if: ${{ inputs.type == 'nix' && ( inputs.job == 'ci' || inputs.job == 'lint' ) }}
