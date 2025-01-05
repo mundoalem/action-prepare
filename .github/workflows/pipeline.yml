@@ -75,3 +75,5 @@ jobs:
           task --version
           which cdktf
           cdktf --version
+          which tenv
+          tenv --version
