@@ -41,6 +41,11 @@ inputs:
     required: false
     default: "3.1.0"
 
+  version_cdktf:
+    description: "Version of cdktf to be installed"
+    required: false
+    default: "0.20.10"
+
   version_checkov:
     description: "Version of checkov to be installed"
     required: false
@@ -155,4 +160,4 @@ runs:
       if: ${{ inputs.type == 'cdktf' }}
       shell: bash
       run: |
-        npm install --global cdktf-cli@latest
+        npm install --global cdktf-cli@${{ inputs.version_cdktf }}
