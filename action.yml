@@ -102,6 +102,11 @@ runs:
         mv task /usr/local/bin
         chmod +x /usr/local/bin/task
 
+    - name: setup direnv
+      shell: bash
+      run: |
+        curl -sfL https://direnv.net/install.sh | bash
+
     - name: install hadolint
       if: ${{ inputs.type == 'container' && inputs.job == 'lint' }}
       shell: bash
@@ -130,11 +135,11 @@ runs:
 
     - name: setup qemu
       if: ${{ inputs.type == 'container' && ( inputs.job == 'ci' || inputs.job == 'cd')}}
-      uses: docker/setup-qemu-action@v3.2.0
+      uses: docker/setup-qemu-action@v3.6.0
 
     - name: setup docker buildx
       if: ${{ inputs.type == 'container' && inputs.job == 'cd' }}
-      uses: docker/setup-buildx-action@v3.7.1
+      uses: docker/setup-buildx-action@v3.11.1
 
     - name: setup tenv
       if: ${{ inputs.type == 'terraform' }}
