@@ -8,9 +8,9 @@ currently supported project types and jobs are:
 
 | Project Type | Jobs               | OS    |
 | ------------ | ------------------ | ----- |
-| cdktf        | cd, ci             | linux |
 | container    | cd, ci, lint, scan | linux |
-| nix          | ci                 | linux |
+| nix          | ci, lint           | linux |
+| terraform    | any                | linux |
 
 # Inputs
 
@@ -18,12 +18,11 @@ currently supported project types and jobs are:
 | ----------------- | ------------------------------------ | -------- | ------- |
 | job               | Job we are preparing for             | Yes      |         |
 | type              | Project type we are preparing for    | Yes      |         |
-| version_alejandra | Version of alejandra to be installed | No       | 3.1.0   |
-| version_cdktf     | Version of cdktf to be installed     | No       | 0.20.10 |
-| version_checkov   | Version of checkov to be installed   | No       | 3.2.322 |
-| version_hadolint  | Version of hadolint to be installed  | No       | 2.12.0  |
-| version_task      | Version of task to be installed      | No       | 3.40.0  |
-| version_tenv      | Version of tenv to be installed      | No       | 4.1.0   |
+| version_alejandra | Version of alejandra to be installed | No       | 4.0.0   |
+| version_checkov   | Version of checkov to be installed   | No       | 3.2.484 |
+| version_hadolint  | Version of hadolint to be installed  | No       | 2.14.0  |
+| version_task      | Version of task to be installed      | No       | 3.45.4  |
+| version_tenv      | Version of tenv to be installed      | No       | 4.7.21  |
 
 
 # Outputs

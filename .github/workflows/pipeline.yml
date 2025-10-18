@@ -54,10 +54,16 @@ jobs:
           type: nix
           job: ci
 
-      - name: Test CI of CDKTF Projects
+      - name: Test CI of Nix Projects
         uses: ./
         with:
-          type: cdktf
+          type: nix
+          job: nix
+
+      - name: Test CI of terraform Projects
+        uses: ./
+        with:
+          type: terraform
           job: ci
 
       - name: Verification
@@ -68,12 +74,11 @@ jobs:
           which checkov
           checkov --version
           which docker
+          docker --version
           docker buildx version
           which hadolint
           hadolint --version
           which task
           task --version
-          which cdktf
-          cdktf --version
           which tenv
           tenv --version
