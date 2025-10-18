@@ -73,6 +73,8 @@ jobs:
           alejandra --version
           which checkov
           checkov --version
+          which direnv
+          direnv version
           which docker
           docker --version
           docker buildx version
