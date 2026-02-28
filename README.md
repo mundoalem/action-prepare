@@ -19,11 +19,11 @@ currently supported project types and jobs are:
 | job               | Job we are preparing for             | Yes      |         |
 | type              | Project type we are preparing for    | Yes      |         |
 | version_alejandra | Version of alejandra to be installed | No       | 4.0.0   |
-| version_checkov   | Version of checkov to be installed   | No       | 3.2.484 |
+| version_checkov   | Version of checkov to be installed   | No       | 3.2.501 |
 | version_hadolint  | Version of hadolint to be installed  | No       | 2.14.0  |
-| version_task      | Version of task to be installed      | No       | 3.45.4  |
-| version_tenv      | Version of tenv to be installed      | No       | 4.7.21  |
-
+| version_task      | Version of task to be installed      | No       | 3.48.0  |
+| version_tenv      | Version of tenv to be installed      | No       | 4.9.3   |
+| version_tflint    | Version of tflint to be installed    | No       | 0.61.0  |
 
 # Outputs
 

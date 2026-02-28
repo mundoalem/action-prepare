@@ -60,11 +60,11 @@ jobs:
           type: nix
           job: nix
 
-      - name: Test CI of terraform Projects
+      - name: Test Lint of terraform Projects
         uses: ./
         with:
           type: terraform
-          job: ci
+          job: lint
 
       - name: Verification
         run: |
@@ -84,3 +84,5 @@ jobs:
           task --version
           which tenv
           tenv --version
+          which tflint
+          tflint --version

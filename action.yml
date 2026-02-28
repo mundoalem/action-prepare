@@ -44,7 +44,7 @@ inputs:
   version_checkov:
     description: "Version of checkov to be installed"
     required: false
-    default: "3.2.484"
+    default: "3.2.501"
 
   version_hadolint:
     description: "Version of hadolint to be installed"
@@ -54,12 +54,17 @@ inputs:
   version_task:
     description: "Version of task to be installed"
     required: false
-    default: "3.45.4"
+    default: "3.48.0"
 
   version_tenv:
     description: "Version of tenv to be installed"
     required: false
-    default: "4.7.21"
+    default: "4.9.3"
+
+  version_tflint:
+    description: "Version of tflint to be installed"
+    required: false
+    default: "0.61.0"
 
 # ##############################################################################
 # OUTPUTS
@@ -127,14 +132,14 @@ runs:
         chmod +x /usr/local/bin/hadolint
 
     - name: install checkov
-      if: ${{ inputs.type == 'container' && inputs.job == 'scan' }}
+      if: ${{ (inputs.type == 'container' || inputs.type == 'terraform') && inputs.job == 'scan' }}
       shell: bash
       run: |
         pip install --user checkov==${{ inputs.version_checkov }}
         which checkov
 
     - name: setup qemu
-      if: ${{ inputs.type == 'container' && ( inputs.job == 'ci' || inputs.job == 'cd')}}
+      if: ${{ inputs.type == 'container' && (inputs.job == 'ci' || inputs.job == 'cd') }}
       uses: docker/setup-qemu-action@v3.6.0
 
     - name: setup docker buildx
@@ -160,6 +165,30 @@ runs:
 
         sudo dpkg -i /tmp/tenv.deb
         rm -f /tmp/tenv.deb
+
+    - name: setup tflint
+      if: ${{ inputs.type == 'terraform' && inputs.job == 'lint' }}
+      shell: bash
+      run: |
+        if [ ${{ runner.arch }} = "ARM64" ]; then
+          ARCH="arm64"
+        elif [ ${{ runner.arch }} = "X64" ]; then
+          ARCH="amd64"
+        else
+          echo "::error title=unsupported cpu architecture"
+          exit 1
+        fi
+
+        curl -fsSL \
+          -o /tmp/tflint.zip \
+          "https://github.com/terraform-linters/tflint/releases/download/v${{ inputs.version_tflint }}/tflint_linux_${ARCH}.zip"
+
+        cd /tmp
+        unzip tflint.zip
+        chmod +x tflint
+        mv tflint /usr/local/bin/
+        rm -f tflint.zip
+        cd -
 
     - name: setup alejandra
       if: ${{ inputs.type == 'nix' && ( inputs.job == 'ci' || inputs.job == 'lint' ) }}
