@@ -132,7 +132,7 @@ runs:
         chmod +x /usr/local/bin/hadolint
 
     - name: install checkov
-      if: ${{ (inputs.type == 'container' || $inputs.type == 'terraform') && inputs.job == 'scan' }}
+      if: ${{ (inputs.type == 'container' || inputs.type == 'terraform') && inputs.job == 'scan' }}
       shell: bash
       run: |
         pip install --user checkov==${{ inputs.version_checkov }}
