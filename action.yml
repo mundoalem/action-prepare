@@ -167,7 +167,7 @@ runs:
         rm -f /tmp/tenv.deb
 
     - name: setup tflint
-      if: ${{ inputs.type == 'terraform' && inputs.job == 'lint' }}
+      if: ${{ inputs.type == 'terraform' }}
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
