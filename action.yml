@@ -54,7 +54,7 @@ inputs:
   version_task:
     description: "Version of task to be installed"
     required: false
-    default: "3.48.0"
+    default: "3.50.0"
 
   version_tenv:
     description: "Version of tenv to be installed"
@@ -92,20 +92,25 @@ runs:
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
-          ARCH="arm64"
+          cpuarch="arm64"
         elif [ ${{ runner.arch }} = "X64" ]; then
-          ARCH="amd64"
+          cpuarch="amd64"
         else
           echo "::error title=unsupported cpu architecture"
           exit 1
         fi
 
-        curl -fsSL \
-          "https://github.com/go-task/task/releases/download/v${{ inputs.version_task }}/task_linux_${ARCH}.tar.gz" \
-          | tar zxf - task
+        curl -sOL \
+          https://github.com/go-task/task/releases/download/v${{ inputs.version_task }}/task_checksums.txt
 
+        curl -sOL \
+          "https://github.com/go-task/task/releases/download/v${{ inputs.version_task }}/task_linux_${cpuarch}.tar.gz"
+
+        sha256sum -c task_checksums.txt --ignore-missing
+        tar zxf task_linux_${cpuarch}.tar.gz task
         mv task /usr/local/bin
         chmod +x /usr/local/bin/task
+        rm -f task_*
 
     - name: setup direnv
       shell: bash
@@ -117,19 +122,20 @@ runs:
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
-          ARCH="arm64"
+          cpuarch="arm64"
         elif [ ${{ runner.arch }} = "X64" ]; then
-          ARCH="x86_64"
+          cpuarch="x86_64"
         else
           echo "::error title=unsupported cpu architecture"
           exit 1
         fi
 
-        curl -fsSL \
-          -o /usr/local/bin/hadolint \
-          "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version_hadolint }}/hadolint-Linux-${ARCH}"
-
+        curl -sOL "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version_hadolint }}/hadolint-linux-${cpuarch}"
+        curl -sOL "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version_hadolint }}/hadolint-linux-${cpuarch}.sha256"
+        sha256sum -c "hadolint-linux-${cpuarch}.sha256"
+        mv "hadolint-linux-${cpuarch}" /usr/local/bin/hadolint
         chmod +x /usr/local/bin/hadolint
+        rm -f hadolint-*
 
     - name: install checkov
       if: ${{ (inputs.type == 'container' || inputs.type == 'terraform') && inputs.job == 'scan' }}
