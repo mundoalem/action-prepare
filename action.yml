@@ -46,6 +46,11 @@ inputs:
     required: false
     default: "3.2.501"
 
+  version_direnv:
+    description: "Version of direnv to be installed"
+    required: false
+    default: "2.37.1"
+
   version_hadolint:
     description: "Version of hadolint to be installed"
     required: false
@@ -100,24 +105,33 @@ runs:
           exit 1
         fi
 
-        curl -sOL \
-          https://github.com/go-task/task/releases/download/v${{ inputs.version_task }}/task_checksums.txt
-
-        curl -sOL \
-          "https://github.com/go-task/task/releases/download/v${{ inputs.version_task }}/task_linux_${cpuarch}.tar.gz"
-
+        curl -sOL "https://github.com/go-task/task/releases/download/v${{ inputs.version_task }}/task_checksums.txt"
+        curl -sOL "https://github.com/go-task/task/releases/download/v${{ inputs.version_task }}/task_linux_${cpuarch}.tar.gz"
         sha256sum -c task_checksums.txt --ignore-missing
         tar zxf task_linux_${cpuarch}.tar.gz task
-        mv task /usr/local/bin
+        mv task /usr/local/bin/
         chmod +x /usr/local/bin/task
         rm -f task_*
 
     - name: setup direnv
       shell: bash
       run: |
-        curl -sfL https://direnv.net/install.sh | bash
+        if [ ${{ runner.arch }} = "ARM64" ]; then
+          cpuarch="arm64"
+          checksum="sha256:2a9cef8d73521d6a3ec3f2871c4b747b8c4cc038628c1b57a7efa42b393a2d82"
+        elif [ ${{ runner.arch }} = "X64" ]; then
+          cpuarch="amd64"
+          checksum="sha256:1f1b93dd6f38523fde26dfac96151ef9d31a374e3005cd3345fb93555ae0c9b5"
+        else
+          echo "::error title=unsupported cpu architecture"
+          exit 1
+        fi
 
-    - name: install hadolint
+        curl -sOL "https://github.com/direnv/direnv/releases/download/v${{ inputs.version_direnv }}/direnv.linux-${cpuarch}"
+        echo "${checksum}  direnv.linux-${cpuarch}" | sha256sum -c -
+        mv "direnv.linux-${cpuarch}" /usr/local/bin/direnv
+
+    - name: setup hadolint
       if: ${{ inputs.type == 'container' && inputs.job == 'lint' }}
       shell: bash
       run: |
