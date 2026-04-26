@@ -130,6 +130,7 @@ runs:
         curl -sOL "https://github.com/direnv/direnv/releases/download/v${{ inputs.version_direnv }}/direnv.linux-${cpuarch}"
         echo "${checksum}  direnv.linux-${cpuarch}" | sha256sum -c -
         mv "direnv.linux-${cpuarch}" /usr/local/bin/direnv
+        chmod +x /usr/local/bin/direnv
 
     - name: setup hadolint
       if: ${{ inputs.type == 'container' && inputs.job == 'lint' }}
