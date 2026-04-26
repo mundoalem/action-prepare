@@ -160,31 +160,49 @@ runs:
 
     - name: setup qemu
       if: ${{ inputs.type == 'container' && (inputs.job == 'ci' || inputs.job == 'cd') }}
-      uses: docker/setup-qemu-action@v3.6.0
+      uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
 
     - name: setup docker buildx
       if: ${{ inputs.type == 'container' && inputs.job == 'cd' }}
-      uses: docker/setup-buildx-action@v3.11.1
+      uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
     - name: setup tenv
       if: ${{ inputs.type == 'terraform' }}
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
-          ARCH="arm64"
+          cpuarch="arm64"
         elif [ ${{ runner.arch }} = "X64" ]; then
-          ARCH="amd64"
+          cpuarch="amd64"
         else
           echo "::error title=unsupported cpu architecture"
           exit 1
         fi
 
-        curl -fsSL \
-          -o /tmp/tenv.deb \
-          "https://github.com/tofuutils/tenv/releases/latest/download/tenv_v${{ inputs.version_tenv }}_${ARCH}.deb"
+        curl -sOL "https://github.com/tofuutils/tenv/releases/download/v${{ inputs.version_tenv }}/tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb"
+        curl -sOL "https://github.com/tofuutils/tenv/releases/download/v${{ inputs.version_tenv }}/tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb.pem"
+        curl -sOL "https://github.com/tofuutils/tenv/releases/download/v${{ inputs.version_tenv }}/tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb.sig"
+        curl -sOL "https://github.com/tofuutils/tenv/releases/download/v${{ inputs.version_tenv }}/tenv_v${{ inputs.version_tenv }}_checksums.txt"
+        curl -sOL "https://github.com/tofuutils/tenv/releases/download/v${{ inputs.version_tenv }}/tenv_v${{ inputs.version_tenv }}_checksums.txt.sig"
+        curl -sOL "https://github.com/tofuutils/tenv/releases/download/v${{ inputs.version_tenv }}/tenv_v${{ inputs.version_tenv }}_checksums.txt.pem"
 
-        sudo dpkg -i /tmp/tenv.deb
-        rm -f /tmp/tenv.deb
+        cosign verify-blob \
+          --certificate-identity "https://github.com/tofuutils/tenv/.github/workflows/release.yml@refs/tags/v${{ inputs.version_tenv }}" \
+          --signature "tenv_v${{ inputs.version_tenv }}_checksums.txt.sig" \
+          --certificate "tenv_v${{ inputs.version_tenv }}_checksums.txt.pem" \
+          --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+          "tenv_v${{ inputs.version_tenv }}_checksums.txt"
+
+        cosign verify-blob \
+          --certificate-identity "https://github.com/tofuutils/tenv/.github/workflows/release.yml@refs/tags/v${{ inputs.version_tenv }}" \
+          --signature "tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb.sig" \
+          --certificate "tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb.pem" \
+          --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+          "tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb"
+
+        sha256sum -c "tenv_v${{ inputs.version_tenv }}_checksums.txt" --ignore-missing
+        dpkg -i "tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb"
+        rm -f tenv_*
 
     - name: setup tflint
       if: ${{ inputs.type == 'terraform' }}
