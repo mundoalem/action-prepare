@@ -214,24 +214,22 @@ runs:
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
-          ARCH="arm64"
+          cpuarch="arm64"
         elif [ ${{ runner.arch }} = "X64" ]; then
-          ARCH="amd64"
+          cpuarch="amd64"
         else
           echo "::error title=unsupported cpu architecture"
           exit 1
         fi
 
-        curl -fsSL \
-          -o /tmp/tflint.zip \
-          "https://github.com/terraform-linters/tflint/releases/download/v${{ inputs.version_tflint }}/tflint_linux_${ARCH}.zip"
+        curl -sOL "https://github.com/terraform-linters/tflint/releases/download/v${{ inputs.version_tflint }}/tflint_linux_${cpuarch}.zip"
+        curl -sOL "https://github.com/terraform-linters/tflint/releases/download/v${{ inputs.version_tflint }}/checksums.txt"
 
-        cd /tmp
-        unzip tflint.zip
-        chmod +x tflint
+        sha256sum -c checksums.txt --ignore-missing
+        unzip "./tflint_linux_${cpuarch}.zip"
         mv tflint /usr/local/bin/
-        rm -f tflint.zip
-        cd -
+        chmod +x /usr/local/bin/tflint
+        rm -f tflint* checksums.txt
 
     - name: setup alejandra
       if: ${{ inputs.type == 'nix' && ( inputs.job == 'ci' || inputs.job == 'lint' ) }}
