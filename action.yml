@@ -44,7 +44,7 @@ inputs:
   version_checkov:
     description: "Version of checkov to be installed"
     required: false
-    default: "3.2.501"
+    default: "3.2.521"
 
   version_direnv:
     description: "Version of direnv to be installed"
@@ -64,7 +64,7 @@ inputs:
   version_tenv:
     description: "Version of tenv to be installed"
     required: false
-    default: "4.9.3"
+    default: "4.10.1"
 
   version_tflint:
     description: "Version of tflint to be installed"
