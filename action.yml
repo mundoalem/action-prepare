@@ -44,7 +44,12 @@ inputs:
   version_checkov:
     description: "Version of checkov to be installed"
     required: false
-    default: "3.2.501"
+    default: "3.2.521"
+
+  version_direnv:
+    description: "Version of direnv to be installed"
+    required: false
+    default: "2.37.1"
 
   version_hadolint:
     description: "Version of hadolint to be installed"
@@ -54,12 +59,12 @@ inputs:
   version_task:
     description: "Version of task to be installed"
     required: false
-    default: "3.48.0"
+    default: "3.50.0"
 
   version_tenv:
     description: "Version of tenv to be installed"
     required: false
-    default: "4.9.3"
+    default: "4.10.1"
 
   version_tflint:
     description: "Version of tflint to be installed"
@@ -92,44 +97,60 @@ runs:
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
-          ARCH="arm64"
+          cpuarch="arm64"
         elif [ ${{ runner.arch }} = "X64" ]; then
-          ARCH="amd64"
+          cpuarch="amd64"
         else
           echo "::error title=unsupported cpu architecture"
           exit 1
         fi
 
-        curl -fsSL \
-          "https://github.com/go-task/task/releases/download/v${{ inputs.version_task }}/task_linux_${ARCH}.tar.gz" \
-          | tar zxf - task
-
-        mv task /usr/local/bin
+        curl -sOL "https://github.com/go-task/task/releases/download/v${{ inputs.version_task }}/task_checksums.txt"
+        curl -sOL "https://github.com/go-task/task/releases/download/v${{ inputs.version_task }}/task_linux_${cpuarch}.tar.gz"
+        sha256sum -c task_checksums.txt --ignore-missing
+        tar zxf task_linux_${cpuarch}.tar.gz task
+        mv task /usr/local/bin/
         chmod +x /usr/local/bin/task
+        rm -f task_*
 
     - name: setup direnv
       shell: bash
       run: |
-        curl -sfL https://direnv.net/install.sh | bash
-
-    - name: install hadolint
-      if: ${{ inputs.type == 'container' && inputs.job == 'lint' }}
-      shell: bash
-      run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
-          ARCH="arm64"
+          cpuarch="arm64"
+          checksum="2a9cef8d73521d6a3ec3f2871c4b747b8c4cc038628c1b57a7efa42b393a2d82"
         elif [ ${{ runner.arch }} = "X64" ]; then
-          ARCH="x86_64"
+          cpuarch="amd64"
+          checksum="1f1b93dd6f38523fde26dfac96151ef9d31a374e3005cd3345fb93555ae0c9b5"
         else
           echo "::error title=unsupported cpu architecture"
           exit 1
         fi
 
-        curl -fsSL \
-          -o /usr/local/bin/hadolint \
-          "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version_hadolint }}/hadolint-Linux-${ARCH}"
+        curl -sOL "https://github.com/direnv/direnv/releases/download/v${{ inputs.version_direnv }}/direnv.linux-${cpuarch}"
+        echo "${checksum}  direnv.linux-${cpuarch}" | sha256sum -c -
+        mv "direnv.linux-${cpuarch}" /usr/local/bin/direnv
+        chmod +x /usr/local/bin/direnv
 
+    - name: setup hadolint
+      if: ${{ inputs.type == 'container' && inputs.job == 'lint' }}
+      shell: bash
+      run: |
+        if [ ${{ runner.arch }} = "ARM64" ]; then
+          cpuarch="arm64"
+        elif [ ${{ runner.arch }} = "X64" ]; then
+          cpuarch="x86_64"
+        else
+          echo "::error title=unsupported cpu architecture"
+          exit 1
+        fi
+
+        curl -sOL "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version_hadolint }}/hadolint-linux-${cpuarch}"
+        curl -sOL "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version_hadolint }}/hadolint-linux-${cpuarch}.sha256"
+        sha256sum -c "hadolint-linux-${cpuarch}.sha256"
+        mv "hadolint-linux-${cpuarch}" /usr/local/bin/hadolint
         chmod +x /usr/local/bin/hadolint
+        rm -f hadolint-*
 
     - name: install checkov
       if: ${{ (inputs.type == 'container' || inputs.type == 'terraform') && inputs.job == 'scan' }}
@@ -140,64 +161,86 @@ runs:
 
     - name: setup qemu
       if: ${{ inputs.type == 'container' && (inputs.job == 'ci' || inputs.job == 'cd') }}
-      uses: docker/setup-qemu-action@v3.6.0
+      uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
 
     - name: setup docker buildx
       if: ${{ inputs.type == 'container' && inputs.job == 'cd' }}
-      uses: docker/setup-buildx-action@v3.11.1
+      uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+
+    - name: setup cosign
+      if: ${{ inputs.type == 'terraform' }}
+      uses: sigstore/cosign-installer@cad07c2e89fa2edd6e2d7bab4c1aa38e53f76003 # v4.1.0
 
     - name: setup tenv
       if: ${{ inputs.type == 'terraform' }}
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
-          ARCH="arm64"
+          cpuarch="arm64"
         elif [ ${{ runner.arch }} = "X64" ]; then
-          ARCH="amd64"
+          cpuarch="amd64"
         else
           echo "::error title=unsupported cpu architecture"
           exit 1
         fi
 
-        curl -fsSL \
-          -o /tmp/tenv.deb \
-          "https://github.com/tofuutils/tenv/releases/latest/download/tenv_v${{ inputs.version_tenv }}_${ARCH}.deb"
+        curl -sOL "https://github.com/tofuutils/tenv/releases/download/v${{ inputs.version_tenv }}/tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb"
+        curl -sOL "https://github.com/tofuutils/tenv/releases/download/v${{ inputs.version_tenv }}/tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb.pem"
+        curl -sOL "https://github.com/tofuutils/tenv/releases/download/v${{ inputs.version_tenv }}/tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb.sig"
+        curl -sOL "https://github.com/tofuutils/tenv/releases/download/v${{ inputs.version_tenv }}/tenv_v${{ inputs.version_tenv }}_checksums.txt"
+        curl -sOL "https://github.com/tofuutils/tenv/releases/download/v${{ inputs.version_tenv }}/tenv_v${{ inputs.version_tenv }}_checksums.txt.sig"
+        curl -sOL "https://github.com/tofuutils/tenv/releases/download/v${{ inputs.version_tenv }}/tenv_v${{ inputs.version_tenv }}_checksums.txt.pem"
 
-        sudo dpkg -i /tmp/tenv.deb
-        rm -f /tmp/tenv.deb
+        cosign verify-blob \
+          --certificate-identity "https://github.com/tofuutils/tenv/.github/workflows/release.yml@refs/tags/v${{ inputs.version_tenv }}" \
+          --signature "tenv_v${{ inputs.version_tenv }}_checksums.txt.sig" \
+          --certificate "tenv_v${{ inputs.version_tenv }}_checksums.txt.pem" \
+          --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+          "tenv_v${{ inputs.version_tenv }}_checksums.txt"
+
+        cosign verify-blob \
+          --certificate-identity "https://github.com/tofuutils/tenv/.github/workflows/release.yml@refs/tags/v${{ inputs.version_tenv }}" \
+          --signature "tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb.sig" \
+          --certificate "tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb.pem" \
+          --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+          "tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb"
+
+        sha256sum -c "tenv_v${{ inputs.version_tenv }}_checksums.txt" --ignore-missing
+        sudo dpkg -i "tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb"
+        rm -f tenv_*
 
     - name: setup tflint
       if: ${{ inputs.type == 'terraform' }}
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
-          ARCH="arm64"
+          cpuarch="arm64"
         elif [ ${{ runner.arch }} = "X64" ]; then
-          ARCH="amd64"
+          cpuarch="amd64"
         else
           echo "::error title=unsupported cpu architecture"
           exit 1
         fi
 
-        curl -fsSL \
-          -o /tmp/tflint.zip \
-          "https://github.com/terraform-linters/tflint/releases/download/v${{ inputs.version_tflint }}/tflint_linux_${ARCH}.zip"
+        curl -sOL "https://github.com/terraform-linters/tflint/releases/download/v${{ inputs.version_tflint }}/tflint_linux_${cpuarch}.zip"
+        curl -sOL "https://github.com/terraform-linters/tflint/releases/download/v${{ inputs.version_tflint }}/checksums.txt"
 
-        cd /tmp
-        unzip tflint.zip
-        chmod +x tflint
+        sha256sum -c checksums.txt --ignore-missing
+        unzip "./tflint_linux_${cpuarch}.zip"
         mv tflint /usr/local/bin/
-        rm -f tflint.zip
-        cd -
+        chmod +x /usr/local/bin/tflint
+        rm -f tflint* checksums.txt
 
     - name: setup alejandra
       if: ${{ inputs.type == 'nix' && ( inputs.job == 'ci' || inputs.job == 'lint' ) }}
       shell: bash
       run: |
         if [ ${{ runner.arch }} = "ARM64" ]; then
-          ARCH="aarch64"
+          cpuarch="aarch64"
+          checksum="a30b0d54ee3f0d6633d0398b50258408d2cc31646a9c8c4ba3ee4ebf2cebd8c8"
         elif [ ${{ runner.arch }} = "X64" ]; then
-          ARCH="x86_64"
+          cpuarch="x86_64"
+          checksum="a23b9d47cba945805c6169541046de890e94e07a5aa416c86dee15bca2da6216"
         else
           echo "::error title=unsupported cpu architecture"
           exit 1
@@ -205,6 +248,7 @@ runs:
 
         curl -fsSL \
           -o /usr/local/bin/alejandra \
-          "https://github.com/kamadorueda/alejandra/releases/download/${{ inputs.version_alejandra }}/alejandra-${ARCH}-unknown-linux-musl"
+          "https://github.com/kamadorueda/alejandra/releases/download/${{ inputs.version_alejandra }}/alejandra-${cpuarch}-unknown-linux-musl"
 
+        echo "${checksum}  /usr/local/bin/alejandra" | sha256sum -c -
         chmod +x /usr/local/bin/alejandra
