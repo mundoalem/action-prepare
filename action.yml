@@ -205,7 +205,7 @@ runs:
           "tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb"
 
         sha256sum -c "tenv_v${{ inputs.version_tenv }}_checksums.txt" --ignore-missing
-        dpkg -i "tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb"
+        sudo dpkg -i "tenv_v${{ inputs.version_tenv }}_${cpuarch}.deb"
         rm -f tenv_*
 
     - name: setup tflint
